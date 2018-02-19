@@ -45,7 +45,7 @@ public:
 };
 class Izuzetak : public exception {
 	string _funkcija;
-public :
+public:
 	Izuzetak(string opis, string funkcija) :exception(opis.c_str()), _funkcija(funkcija) {}
 	friend ostream &operator <<(ostream &o, const Izuzetak &i) {
 		o << i.what() << endl << "Funkcija -> " << i._funkcija;
@@ -66,7 +66,7 @@ public:
 		_elementi1 = nullptr;
 		_elementi2 = nullptr;
 	}
-	Kolekcija(const Kolekcija &k):_trenutnoElemenata(k._trenutnoElemenata),
+	Kolekcija(const Kolekcija &k) :_trenutnoElemenata(k._trenutnoElemenata),
 		_omoguciDupliranjeElemenata(k._omoguciDupliranjeElemenata), _elementi1(new T1[k._trenutnoElemenata]), _elementi2(new T2[k._trenutnoElemenata]) {
 		for (size_t i = 0; i < k._trenutnoElemenata; i++)
 		{
@@ -79,7 +79,7 @@ public:
 		delete[]_elementi1; _elementi1 = nullptr;
 		_trenutnoElemenata = 0;
 	}
-	
+
 	int GetTrenutno() const { return _trenutnoElemenata; }
 	T1& GetElement1(int lokacija) const
 	{
@@ -167,7 +167,7 @@ public:
 	friend ostream &operator<<(ostream &COUT, const Kolekcija &obj) {
 		for (size_t i = 0; i < obj.GetTrenutno(); i++)
 			COUT << obj._elementi1[i] << " " << obj._elementi2[i] << endl;
-return COUT;
+		return COUT;
 	}
 };
 
@@ -306,33 +306,33 @@ public:
 						&DLWMSReminder::PosaljiPoruku,
 						this,
 						"Postovani " + i->GetImePrezime() + "\n" +
-						"Dogadjaj " + j->GetNaziv() + "je zakazan za "+to_string(j->GetDatumObaveze().GetDani() - d.GetDani()) +", "+
-						"a do sada ste ispunili " + 
+						"Dogadjaj " + j->GetNaziv() + "je zakazan za " + to_string(j->GetDatumObaveze().GetDani() - d.GetDani()) + ", " +
+						"a do sada ste ispunili " +
 						to_string([j]()->float {
 						int brojac = 0;
 						for (size_t i = 0; i < j->GetObaveze()->GetTrenutno(); i++)
 						{
 							if (j->GetObaveze()->GetElement2(i)) brojac++;
 						}
-						return ((float)brojac / j->GetObaveze()->GetTrenutno())*100;
-						}()) + 
+						return ((float)brojac / j->GetObaveze()->GetTrenutno()) * 100;
+					}()) +
 						"% svojih obaveza. " +
-						"Neispunjene obaveze su: \n " + 
+						"Neispunjene obaveze su: \n " +
 						[j]()->string {
-							int brojac = 1;
-							string s = "";
-							for (size_t i = 0; i < j->GetObaveze()->GetTrenutno(); i++)
-							{
-								if (!j->GetObaveze()->GetElement2(i)) {
-									s += to_string(brojac) + ". " + j->GetObaveze()->GetElement1(i) + "\n";
-									brojac++;
-								}
+						int brojac = 1;
+						string s = "";
+						for (size_t i = 0; i < j->GetObaveze()->GetTrenutno(); i++)
+						{
+							if (!j->GetObaveze()->GetElement2(i)) {
+								s += to_string(brojac) + ". " + j->GetObaveze()->GetElement1(i) + "\n";
+								brojac++;
 							}
-							return s;
-						}() +
+						}
+						return s;
+					}() +
 						"Predlazemo Vam da ispunite i ostale planirane obaveze.\n" +
 						"FIT Reminder\n" + crt
-					);
+						);
 					t.join();
 				}
 			}
@@ -429,10 +429,11 @@ void main() {
 		//u slucaju dupliranja studenata funkcija baca izuzetak tipa Izuzetak
 		reminder.AddStudent(jasmin);
 	}
-	catch (Izuzetak &err)
+	catch (exception &err)
 	{
+		Izuzetak i = dynamic_cast<Izuzetak&>(err);
 		//ispisati sve informacije o nastalom izuzetku
-		cout << err << endl;
+		cout << i << endl;
 	}
 
 	//da bi bila oznacena kao zavrsena, obaveza mora postojati i mora biti oznacena kao nezavrsena (false)
