@@ -5,7 +5,7 @@
 #include <ctime>
 using namespace std;
 
-bool ProvjeriFormatTelefona(string telefon){
+bool ProvjeriFormatTelefona(string telefon) {
 	return regex_match(telefon, regex("(\\()(\\d{3})(\\))(\\d{3})(\\-)(\\d{3})"));
 }
 
@@ -17,7 +17,7 @@ public:
 		_mjesec = new int(mjesec);
 		_godina = new int(godina);
 	}
-	Datum(const Datum &d){
+	Datum(const Datum &d) {
 		_dan = new int(*d._dan);
 		_mjesec = new int(*d._mjesec);
 		_godina = new int(*d._godina);
@@ -27,21 +27,21 @@ public:
 		delete _mjesec; _mjesec = nullptr;
 		delete _godina; _godina = nullptr;
 	}
-	Datum &operator=(const Datum &d){
+	Datum &operator=(const Datum &d) {
 		*_dan = *d._dan;
 		*_mjesec = *d._mjesec;
 		*_godina = *d._godina;
 		return *this;
 	}
-	bool operator == (const Datum &d){
+	bool operator == (const Datum &d) {
 		return *_dan == *d._dan && *_mjesec == *d._mjesec && *_godina == *d._godina;
 	}
-	bool operator > (const Datum &d){
-		int days = *_dan + *_mjesec*30 + *_godina*365;
-		int days_d = *d._dan + *d._mjesec*30 + *d._godina*365;
+	bool operator > (const Datum &d) {
+		int days = *_dan + *_mjesec * 30 + *_godina * 365;
+		int days_d = *d._dan + *d._mjesec * 30 + *d._godina * 365;
 		return days > days_d;
 	}
-	friend ostream& operator<< (ostream &COUT,const Datum &obj) {
+	friend ostream& operator<< (ostream &COUT, const Datum &obj) {
 		COUT << *obj._dan << " " << *obj._mjesec << " " << *obj._godina;
 		return COUT;
 	}
@@ -52,12 +52,14 @@ class Izuzetak :public exception {
 	string _funkcija;//FUNKCIJA U KOJOJ JE NASTAO IZUZETAK
 	int _linija;//LINIJA CODE-A U KOJOJ JE NASTAO IZUZETAK
 public:
-	Izuzetak(string fun, int line, const char * poruka):exception(poruka), _funkcija(fun), _linija(line){
+	Izuzetak(string fun, int line, const char * poruka) :exception(poruka), _funkcija(fun), _linija(line) {
 		time_t current = time(0);
-		Datum d(localtime(&current)->tm_mday, localtime(&current)->tm_mon, localtime(&current)->tm_year);
+		tm localcurrent;
+		localtime_s(&localcurrent, &current);
+		Datum d(localcurrent.tm_mday, localcurrent.tm_mon, localcurrent.tm_year);
 		_datum = d;
 	}
-	friend ostream &operator <<(ostream &output, const Izuzetak &i){
+	friend ostream &operator <<(ostream &output, const Izuzetak &i) {
 		output << "Datum -> " << i._datum << endl;
 		output << "Funkcija -> " << i._funkcija << endl;
 		output << "Linija -> " << i._linija << endl;
@@ -72,9 +74,9 @@ class Kolekcija {
 	T2 _elementi2[max];
 	int * _trenutno;
 public:
-	Kolekcija():_trenutno(new int(0)){}
-	~Kolekcija(){ delete _trenutno; }
-	Kolekcija(const Kolekcija &k):_trenutno(new int(*k._trenutno)){
+	Kolekcija() :_trenutno(new int(0)) {}
+	~Kolekcija() { delete _trenutno; }
+	Kolekcija(const Kolekcija &k) :_trenutno(new int(*k._trenutno)) {
 		time_t current;
 		time(&current);
 		if (max < k.GetMax()) throw Izuzetak(__FUNCTION__, __LINE__, "Nemoguce kopiranje objekata");
@@ -84,7 +86,7 @@ public:
 			_elementi2[i] = k._elementi2[i];
 		}
 	}
-	void AddElement(T1 el1, T2 el2){
+	void AddElement(T1 el1, T2 el2) {
 		time_t current;
 		time(&current);
 		if (*_trenutno == max) throw Izuzetak(__FUNCTION__, __LINE__, "Prekoracili ste kapacitet kolekcija");
@@ -92,7 +94,7 @@ public:
 		_elementi2[*_trenutno] = el2;
 		(*_trenutno)++;
 	}
-	Kolekcija &operator=(const Kolekcija &k){
+	Kolekcija &operator=(const Kolekcija &k) {
 		*_trenutno = *k._trenutno;
 		for (size_t i = 0; i < *k._trenutno; i++)
 		{
@@ -101,28 +103,28 @@ public:
 		}
 		return *this;
 	}
-	int GetMax()const{ return max; }
-	T1 GetElement1(int i)const{
+	int GetMax()const { return max; }
+	T1 GetElement1(int i)const {
 		time_t current = time(0);
 		time(&current);
 		if (i < 0 || i >= *_trenutno) throw Izuzetak(__FUNCTION__, __LINE__, "Nepostojeci element");
 		return _elementi1[i];
 	}
-	T2 GetElement2(int i)const{
+	T2 GetElement2(int i)const {
 		time_t current = time(0);
 		time(&current);
 		if (i < 0 || i >= *_trenutno) throw Izuzetak(__FUNCTION__, __LINE__, "Nepostojeci element");
 		return _elementi2[i];
 	}
-	T1 &operator[](int i){
+	T1 &operator[](int i) {
 		time_t current = time(0);
 		time(&current);
 		if (i < 0 || i >= *_trenutno) throw Izuzetak(__FUNCTION__, __LINE__, "Nepostojeci element");
 		return _elementi1[i];
 	}
-	int GetTrenutno()const{ return *_trenutno; }
-	void Clear(){ *_trenutno = 0; }
-	friend ostream& operator<< (ostream &output,const Kolekcija &k){
+	int GetTrenutno()const { return *_trenutno; }
+	void Clear() { *_trenutno = 0; }
+	friend ostream& operator<< (ostream &output, const Kolekcija &k) {
 		for (size_t i = 0; i < k.GetTrenutno(); i++)
 			output << k.GetElement1(i) << " " << k.GetElement2(i) << endl;
 		return output;
@@ -136,23 +138,23 @@ class Kurs {
 	Datum _kraj;
 	char * _imePredavaca;
 public:
-	Kurs():_imePredavaca(nullptr){}
-	Kurs(enumKursevi kurs, const char *predavac, Datum pocetak, Datum kraj):_kurs(kurs), _pocetak(pocetak), _kraj(kraj){
+	Kurs() :_imePredavaca(nullptr) {}
+	Kurs(enumKursevi kurs, const char *predavac, Datum pocetak, Datum kraj) :_kurs(kurs), _pocetak(pocetak), _kraj(kraj) {
 		int size = strlen(predavac) + 1;
 		_imePredavaca = new char[size];
 		strcpy_s(_imePredavaca, size, predavac);
 	}
-	~Kurs(){ delete[] _imePredavaca; }
-	Kurs(const Kurs &k):_kurs(k._kurs), _pocetak(k._pocetak), _kraj(k._kraj){
+	~Kurs() { delete[] _imePredavaca; }
+	Kurs(const Kurs &k) :_kurs(k._kurs), _pocetak(k._pocetak), _kraj(k._kraj) {
 		int size = strlen(k._imePredavaca) + 1;
 		_imePredavaca = new char[size];
 		strcpy_s(_imePredavaca, size, k._imePredavaca);
 	}
-	bool operator==(const Kurs &k){
+	bool operator==(const Kurs &k) {
 		return _kurs == k._kurs && _pocetak == k._pocetak && _kraj == k._kraj && strcmp(_imePredavaca, k._imePredavaca) == 0;
 	}
-	Kurs &operator=(const Kurs &k){
-		if (this != &k){
+	Kurs &operator=(const Kurs &k) {
+		if (this != &k) {
 			delete[] _imePredavaca;
 			_kurs = k._kurs;
 			_pocetak = k._pocetak;
@@ -163,12 +165,12 @@ public:
 		}
 		return *this;
 	}
-	const char *GetPredavac(){ return _imePredavaca; }
-	Datum GetPocetak(){ return _pocetak; }
-	Datum GetKraj(){ return _kraj; }
-	enumKursevi GetVrstaKursa(){ return _kurs;  }
-	friend ostream& operator << (ostream &cout, const Kurs &k){
-		cout << "Naziv kursa -> " << k._kurs<<endl;
+	const char *GetPredavac() { return _imePredavaca; }
+	Datum GetPocetak() { return _pocetak; }
+	Datum GetKraj() { return _kraj; }
+	enumKursevi GetVrstaKursa() { return _kurs; }
+	friend ostream& operator << (ostream &cout, const Kurs &k) {
+		cout << "Naziv kursa -> " << k._kurs << endl;
 		cout << "Predavac -> " << k._imePredavaca << endl;
 		cout << "Pocetak -> " << k._pocetak << endl;
 		cout << "Kraj -> " << k._kraj << endl;
@@ -184,21 +186,21 @@ class Polaznik {
 	Kolekcija<Kurs *, int, 10> _uspjesnoOkoncaniKursevi;
 	//INT PREDSTAVLJA OSTVARENI PROCENAT NA ISPITU, A JEDAN POLAZNIK MOZE POLOZITI NAJVISE 10 KURSEVA
 public:
-	Polaznik(char * imePrezime, string telefon) :_polaznikID(ID++) {
+	Polaznik(const char * imePrezime, string telefon) :_polaznikID(ID++) {
 		int size = strlen(imePrezime) + 1;
 		_imePrezime = new char[size];
 		strcpy_s(_imePrezime, size, imePrezime);
 		_kontaktTelefon = telefon;
 	}
-	Polaznik(const Polaznik &p):_polaznikID(p._polaznikID), _kontaktTelefon(p._kontaktTelefon), _uspjesnoOkoncaniKursevi(p._uspjesnoOkoncaniKursevi){
+	Polaznik(const Polaznik &p) :_polaznikID(p._polaznikID), _kontaktTelefon(p._kontaktTelefon), _uspjesnoOkoncaniKursevi(p._uspjesnoOkoncaniKursevi) {
 		int size = strlen(p._imePrezime) + 1;
 		_imePrezime = new char[size];
 		strcpy_s(_imePrezime, size, p._imePrezime);
 	}
-	void AddKurs(Kurs k, int procenat){
+	void AddKurs(Kurs k, int procenat) {
 		_uspjesnoOkoncaniKursevi.AddElement(new Kurs(k), procenat);
 	}
-	int GetID()const{ return _polaznikID; }
+	int GetID()const { return _polaznikID; }
 	~Polaznik() {
 		delete[] _imePrezime; _imePrezime = nullptr;
 		for (size_t i = 0; i < _uspjesnoOkoncaniKursevi.GetTrenutno(); i++)
@@ -207,28 +209,28 @@ public:
 			_uspjesnoOkoncaniKursevi[i] = nullptr;
 		}
 	}
-	bool operator == (const Polaznik &p){
+	bool operator == (const Polaznik &p) {
 		if (_uspjesnoOkoncaniKursevi.GetTrenutno() != p._uspjesnoOkoncaniKursevi.GetTrenutno() || strcmp(_imePrezime, p._imePrezime) != 0) return false;
 		for (size_t i = 0; i < _uspjesnoOkoncaniKursevi.GetTrenutno(); i++)
 			if (_uspjesnoOkoncaniKursevi.GetElement1(i) != p._uspjesnoOkoncaniKursevi.GetElement1(i)) return false;
 		return true;
 	}
-	Polaznik &operator = (const Polaznik &p){
-		if (this != &p){
+	Polaznik &operator = (const Polaznik &p) {
+		if (this != &p) {
 			_uspjesnoOkoncaniKursevi.Clear();
 			int size = strlen(p._imePrezime) + 1;
 			_imePrezime = new char[size];
 			strcpy_s(_imePrezime, size, p._imePrezime);
 			_kontaktTelefon = p._kontaktTelefon;
 			for (size_t i = 0; i < p._uspjesnoOkoncaniKursevi.GetTrenutno(); i++)
-				_uspjesnoOkoncaniKursevi.AddElement(new Kurs(*p._uspjesnoOkoncaniKursevi.GetElement1(i)), p._uspjesnoOkoncaniKursevi.GetElement2(i)); 
+				_uspjesnoOkoncaniKursevi.AddElement(new Kurs(*p._uspjesnoOkoncaniKursevi.GetElement1(i)), p._uspjesnoOkoncaniKursevi.GetElement2(i));
 		}
 		return *this;
 	}
-	Kolekcija<Kurs*, int, 10> GetUspjenoOkoncaniKursevi(){ return _uspjesnoOkoncaniKursevi; }
-	friend ostream& operator << (ostream &cout, const Polaznik &p){
-		cout << "ID -> " << p._polaznikID<<endl<<"Ime i prezime -> "<<p._imePrezime<<endl<<
-			"Telefon -> "<<p._kontaktTelefon<<"Lista polozenih kurseva -> "<<p._uspjesnoOkoncaniKursevi<<endl;
+	Kolekcija<Kurs*, int, 10> GetUspjenoOkoncaniKursevi() { return _uspjesnoOkoncaniKursevi; }
+	friend ostream& operator << (ostream &cout, const Polaznik &p) {
+		cout << "ID -> " << p._polaznikID << endl << "Ime i prezime -> " << p._imePrezime << endl <<
+			"Telefon -> " << p._kontaktTelefon << "Lista polozenih kurseva -> " << p._uspjesnoOkoncaniKursevi << endl;
 		return cout;
 	}
 };
@@ -242,23 +244,23 @@ public:
 	SkillsCentar(const SkillsCentar & obj) :_kursevi(obj._kursevi), _aplikanti(obj._aplikanti) {
 		_nazivCentra = obj._nazivCentra;
 	}
-	bool ProvjeriKoliziju(Kurs k){
+	bool ProvjeriKoliziju(Kurs k) {
 		for (size_t i = 0; i < _kursevi.size(); i++)
 		{
-			if (_kursevi[i].GetKraj() > k.GetPocetak()){
+			if (_kursevi[i].GetKraj() > k.GetPocetak()) {
 				return false;
 			}
 		}
 		return true;
 	}
-	void AddKurs(Kurs k){
+	void AddKurs(Kurs k) {
 		time_t current;
 		time(&current);
 		for (size_t i = 0; i < _kursevi.size(); i++)
 			if (_kursevi[i] == k) throw Izuzetak(__FUNCTION__, __LINE__, "Nemoguce dodati isti kurs dva puta");
 		_kursevi.push_back(k);
 	}
-	void AddAplikaciju(Kurs k, Polaznik &p){
+	void AddAplikaciju(Kurs k, Polaznik &p) {
 		time_t current;
 		time(&current);
 		bool postoji = false;
@@ -270,22 +272,22 @@ public:
 		if (!postoji) throw Izuzetak(__FUNCTION__, __LINE__, "Kurs ne postoji.");
 		for (size_t i = 0; i < _aplikanti.GetTrenutno(); i++)
 		{
-			if (_aplikanti.GetElement1(i) == k && *_aplikanti.GetElement2(i) == p){
+			if (_aplikanti.GetElement1(i) == k && *_aplikanti.GetElement2(i) == p) {
 				throw Izuzetak(__FUNCTION__, __LINE__, "Aplikacija za ovaj kurs vec postoji.");
 			}
 		}
 		_aplikanti.AddElement(k, &p);
 	}
-	void DodajUspjesnoOkoncanKurs(int ID, Kurs k, int procenat){
+	void DodajUspjesnoOkoncanKurs(int ID, Kurs k, int procenat) {
 		for (size_t i = 0; i < _aplikanti.GetTrenutno(); i++)
 		{
-			if (_aplikanti.GetElement1(i) == k && _aplikanti.GetElement2(i)->GetID() == ID && procenat >= 55){
+			if (_aplikanti.GetElement1(i) == k && _aplikanti.GetElement2(i)->GetID() == ID && procenat >= 55) {
 				_aplikanti.GetElement2(i)->AddKurs(k, procenat);
 				return;
 			}
 		}
 	}
-	bool RemoveKurs(Kurs k){
+	bool RemoveKurs(Kurs k) {
 		bool remove = true;
 		for (size_t i = 0; i < _aplikanti.GetTrenutno(); i++)
 		{
@@ -294,34 +296,34 @@ public:
 		if (!remove) return false;
 		for (vector<Kurs>::iterator i = _kursevi.begin(); i != _kursevi.end(); i++)
 		{
-			if (*i == k){
+			if (*i == k) {
 				_kursevi.erase(i);
 				return true;
 			}
 		}
 		return false;
 	}
-	vector<Polaznik> GetPolazniciByPredavac(const char *predavac, enumKursevi k){
+	vector<Polaznik> GetPolazniciByPredavac(const char *predavac, enumKursevi k) {
 		vector<Polaznik> polaznici;
 		for (size_t i = 0; i < _aplikanti.GetTrenutno(); i++)
 		{
 			for (size_t j = 0; j < _aplikanti.GetElement2(i)->GetUspjenoOkoncaniKursevi().GetTrenutno(); j++)
 			{
-				if (strcmp(_aplikanti.GetElement2(i)->GetUspjenoOkoncaniKursevi().GetElement1(j)->GetPredavac(), predavac) == 0 && _aplikanti.GetElement2(i)->GetUspjenoOkoncaniKursevi().GetElement1(j)->GetVrstaKursa() == k){
+				if (strcmp(_aplikanti.GetElement2(i)->GetUspjenoOkoncaniKursevi().GetElement1(j)->GetPredavac(), predavac) == 0 && _aplikanti.GetElement2(i)->GetUspjenoOkoncaniKursevi().GetElement1(j)->GetVrstaKursa() == k) {
 					polaznici.push_back(*_aplikanti.GetElement2(i));
 				}
 			}
 		}
 		return polaznici;
 	}
-	friend ostream &operator<< (ostream &cout, const SkillsCentar &s){
-		cout << "Naziv centra -> " << s._nazivCentra << endl << "Lista kurseva: "<<endl;
+	friend ostream &operator<< (ostream &cout, const SkillsCentar &s) {
+		cout << "Naziv centra -> " << s._nazivCentra << endl << "Lista kurseva: " << endl;
 		for (size_t i = 0; i < s._kursevi.size(); i++)
 			cout << s._kursevi[i] << endl;
 		return cout;
 	}
 };
-char *crt = "\n---------------------------------------\n";
+const char *crt = "\n---------------------------------------\n";
 void main()
 {
 	/****************************************************************************
