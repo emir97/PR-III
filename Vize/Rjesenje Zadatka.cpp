@@ -44,7 +44,7 @@ public:
 	}
 	Datum &operator++() {
 		(*_dan)++;
-		if((*_mjesec == 1 || *_mjesec == 3 || *_mjesec == 5 || *_mjesec == 7 || *_mjesec == 8 || *_mjesec == 10 || *_mjesec == 12) && *_dan > 31){
+		if ((*_mjesec == 1 || *_mjesec == 3 || *_mjesec == 5 || *_mjesec == 7 || *_mjesec == 8 || *_mjesec == 10 || *_mjesec == 12) && *_dan > 31) {
 			*_dan = 1;
 			(*_mjesec)++;
 		}
@@ -101,11 +101,13 @@ public:
 		_trenutno = 0;
 	}
 	FITKolekcija(const FITKolekcija &k) {
-		_trenutno = k._trenutno;
-		for (size_t i = 0; i < k._trenutno; i++)
-		{
-			_elementi1[i] = new T1(*k._elementi1[i]);
-			_elementi2[i] = new T2(*k._elementi2[i]);
+		if (max >= k.GetMax()) {
+			_trenutno = k._trenutno;
+			for (size_t i = 0; i < k._trenutno; i++)
+			{
+				_elementi1[i] = new T1(*k._elementi1[i]);
+				_elementi2[i] = new T2(*k._elementi2[i]);
+			}
 		}
 	}
 	~FITKolekcija() {
@@ -117,6 +119,7 @@ public:
 	T1 ** GetT1() { return _elementi1; }
 	T2 ** GetT2() { return _elementi2; }
 	int GetTrenutno() { return _trenutno; }
+	int GetMax()const { return max; }
 	void Dodaj(T1 el1, T2 el2) {
 		if (_trenutno == max) throw exception("Kolekcija je puna.");
 		_elementi1[_trenutno] = new T1(el1);
@@ -128,7 +131,7 @@ public:
 			while (promjena)
 			{
 				promjena = false;
-				for (size_t i = 0; i < _trenutno-1; i++)
+				for (size_t i = 0; i < _trenutno - 1; i++)
 				{
 					if (*_elementi1[i] > *_elementi1[i + 1]) {
 						T1 temp1 = *_elementi1[i];
@@ -189,14 +192,14 @@ public:
 			_napomena = nullptr;
 		_drzava = drzava;
 	}
-	Viza(const Viza &v):_drzava(v._drzava), _vazenjeOD(v._vazenjeOD), _vazenjeDO(v._vazenjeDO), _statusi(v._statusi) {
+	Viza(const Viza &v) :_drzava(v._drzava), _vazenjeOD(v._vazenjeOD), _vazenjeDO(v._vazenjeDO), _statusi(v._statusi) {
 		if (v._napomena != nullptr) {
 			int size = strlen(v._napomena) + 1;
 			_napomena = new char[size];
 			strcpy_s(_napomena, size, v._napomena);
 		}
 	}
-	 ~Viza() { delete[] _napomena; _napomena = nullptr; }
+	~Viza() { delete[] _napomena; _napomena = nullptr; }
 	Datum GetVazenjeOD()const { return _vazenjeOD; }
 	Datum GetVazenjeDO()const { return _vazenjeDO; }
 	char * GetNapomena()const { return _napomena; }
@@ -232,9 +235,7 @@ public:
 
 	}
 	void Info() {
-		cout << _drzava << " " << _vazenjeOD << " " << _vazenjeDO << " " << _kompanija << endl;
-		cout << ((_napomena != nullptr) ? _napomena : "") << endl;
-		cout << "STATUSI -> "<<endl<< _statusi << endl;
+		cout << *this << endl;
 	}
 };
 class TuristickaViza : public Viza {
@@ -250,9 +251,7 @@ public:
 		return COUT;
 	}
 	void Info() {
-		cout << _drzava << " " << _vazenjeOD << " " << _vazenjeDO << " " << _adresa << endl;
-		cout << ((_napomena != nullptr) ? _napomena : "") << endl;
-		cout << "STATUSI -> "<<endl << _statusi << endl;
+		cout << *this << endl;
 	}
 };
 
@@ -378,7 +377,7 @@ public:
 		return temp;
 	}
 	void ZamijeniRijec(string rijec, string subrijec) {
-		regex r("(\\b" + rijec + "\\b)|(\\B"+rijec+"\\B)");
+		regex r("(\\b" + rijec + "\\b)|(\\B" + rijec + "\\B)");
 		for (size_t i = 0; i < _vize.size(); i++)
 		{
 			if (_vize[i]->GetNapomena() != nullptr) {
