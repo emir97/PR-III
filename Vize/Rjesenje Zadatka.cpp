@@ -412,7 +412,7 @@ void main() {
 	if (prekosutra == danas)
 		cout << "Datumi su jednaki" << endl;
 	cout << danas << endl << sutra << endl << prekosutra << crt;
-#pragma end
+#pragma endregion
 #pragma TestiranjeKolekcije
 	int v6 = 6, v13 = 13, v32 = 32, v63 = 63, v98 = 98, v109 = 109, v196 = 196;
 
@@ -440,7 +440,7 @@ void main() {
 	{
 		cout << "Error -> " << err.what() << endl;
 	}
-#pragma end
+#pragma endregion
 #pragma TestiranjeAplikanata
 	Aplikant jasmin("Jasmin Azemovic", Datum(15, 5, 1979), "BS6985645");
 	PoslovnaViza poslovna(SAD, dat15022017, dat18082017, "Microsoft");
@@ -488,6 +488,6 @@ void main() {
 
 	//UNUTAR NAPOMENE MIJENJA SADRŽAJ "nemaju informaciju" SA "su upoznti sa" - KORISTITI REGEX
 	jasmin.ZamijeniRijec("nemaju informaciju", "su upoznti sa");
-#pragma end;
+#pragma endregion;
 	getchar();
 }
