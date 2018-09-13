@@ -290,15 +290,17 @@ public:
 	vector<Viza * > GetVize() { return _vize; }
 
 	bool DodajVizu(Viza *v) {
-		if ((2018 - _datumRodjenja->GetYear()) < 18) return false;
-		for (size_t i = 0; i < v->GetStatuse().GetTrenutno(); i++)
-		{
-			if (*v->GetStatuse().GetT1()[i] == Status::ISTEKLA || *v->GetStatuse().GetT1()[i] == Status::PONISTENA)
-				return false;
-		}
+		if ((v->GetVazenjeOD().GetYear() - _datumRodjenja->GetYear()) < 18) return false;
+
 		for (size_t i = 0; i < _vize.size(); i++)
 		{
-			if (_vize[i]->GetDrzava() == Drzava::SAD) {
+			if (_vize[i]->GetDrzava() == v->GetDrzava() && _vize[i]->GetVazenjeDO() > v->GetVazenjeOD()) {
+				for (size_t j = 0; j < _vize[i]->GetStatuse().GetTrenutno(); j++)
+				{
+					if (*_vize[i]->GetStatuse().GetT1()[j] == Status::IZDATA) return false;
+				}
+			}
+			if (_vize[i]->GetDrzava() == Drzava::SAD && v->GetDrzava() == Drzava::SAD) {
 				for (size_t j = 0; j < _vize[i]->GetStatuse().GetTrenutno(); j++)
 				{
 					if (*_vize[i]->GetStatuse().GetT1()[j] == Status::PONISTENA)
@@ -364,13 +366,15 @@ public:
 		for (size_t i = 0; i < _vize.size(); i++)
 		{
 			if (_vize[i]->GetDrzava() == d) {
-				bool status = false;
+				bool status = false, izdata = false;
 				for (size_t j = 0; j < _vize[i]->GetStatuse().GetTrenutno(); j++)
 				{
 					if (*_vize[i]->GetStatuse().GetT1()[j] == s)
 						status = true;
+					if (*_vize[i]->GetStatuse().GetT1()[j] == Status::IZDATA)
+						izdata = true;
 				}
-				if (status && *_vize[i]->GetStatuse().GetT1()[_vize[i]->GetStatuse().GetTrenutno() - 1] == Status::IZDATA)
+				if (status && izdata)
 					temp.push_back(_vize[i]);
 			}
 		}
