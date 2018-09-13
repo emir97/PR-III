@@ -7,7 +7,6 @@
 #include <chrono>
 #include <mutex>
 
-
 using namespace std;
 
 #pragma warning(disable:4996)
@@ -192,6 +191,8 @@ public:
 	Uspjeh(eRazred razred) :_razred(razred), _predmeti(nullptr) {
 	}
 	~Uspjeh() {
+		for (size_t i = 0; i < _predmeti->getTrenutno(); i++)
+			delete _predmeti->getElement1(i);
 		delete _predmeti; _predmeti = nullptr;
 	}
 	Uspjeh(Uspjeh &u) :Uspjeh(u._razred) {
@@ -207,8 +208,8 @@ public:
 	Kolekcija<Predmet*, DatumVrijeme> * GetPredmeti() { return _predmeti; }
 	eRazred GetRazred() { return _razred; }
 
-	friend ostream& operator<< (ostream &COUT,  Uspjeh &obj) {
-		COUT << obj._razred << " RAZRED: "<<crt;
+	friend ostream& operator<< (ostream &COUT, Uspjeh &obj) {
+		COUT << obj._razred << " RAZRED: " << crt;
 		if (obj._predmeti != nullptr) {
 			for (size_t i = 0; i < obj._predmeti->getTrenutno(); i++)
 				cout << *obj._predmeti->getElement1(i) << " " << obj.GetPredmeti()->getElement2(i) << endl;
