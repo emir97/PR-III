@@ -205,7 +205,7 @@ protected:
 public:
 	Osoba(string imePrezime) : _imePrezime(imePrezime) {}
 	string GetImePrezime() { return _imePrezime; }
-	virtual void Info() {};
+	virtual void Info() = 0;
 
 	friend ostream &operator << (ostream &o, const Osoba &os) {
 		o << os._imePrezime;
@@ -221,7 +221,7 @@ public:
 
 	Kolekcija<string, ZavrsniRad>& GetTeme() { return _teme; };
 	friend ostream &operator << (ostream &o, Nastavnik &n) {
-		o << static_cast<const Osoba>(n) << endl;
+		o << dynamic_cast<Osoba&>(n) << endl;
 		o << "Teme: " << endl << n._teme;
 		return o;
 	}
