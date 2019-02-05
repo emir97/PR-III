@@ -113,7 +113,7 @@ public:
 		_sati = new int(sati);
 		_minuti = new int(minuti);
 	}
-	DatumVrijeme(const DatumVrijeme &d):DatumVrijeme(*d._dan, *d._mjesec, *d._godina, *d._sati, *d._minuti) {}
+	DatumVrijeme(const DatumVrijeme &d) :DatumVrijeme(*d._dan, *d._mjesec, *d._godina, *d._sati, *d._minuti) {}
 	~DatumVrijeme() {
 		delete _dan; _dan = nullptr;
 		delete _mjesec; _mjesec = nullptr;
@@ -127,8 +127,8 @@ public:
 	}
 	char * ToCharArray() {
 		stringstream ss;
-		ss << (*_dan < 10 ? "0" : "")<<*_dan<<"/"<<(*_mjesec < 10 ? "0" : "")<<*_mjesec<<"/"<<*_godina
-			<<" "<<(*_sati < 10 ? "0":"")<<*_sati<<":"<<(*_minuti<10 ? "0":"")<<*_minuti;
+		ss << (*_dan < 10 ? "0" : "") << *_dan << "/" << (*_mjesec < 10 ? "0" : "") << *_mjesec << "/" << *_godina
+			<< " " << (*_sati < 10 ? "0" : "") << *_sati << ":" << (*_minuti < 10 ? "0" : "") << *_minuti;
 		return Alociraj(ss.str().c_str());
 	}
 	DatumVrijeme &operator = (const DatumVrijeme &dv) {
@@ -152,7 +152,7 @@ public:
 		_ocjena = ocjena;
 		_napomena = napomena;
 	}
-	Predmet(const Predmet &p):Predmet(p._naziv, p._ocjena, p._napomena) { }
+	Predmet(const Predmet &p) :Predmet(p._naziv, p._ocjena, p._napomena) { }
 	~Predmet() {
 		delete[] _naziv; _naziv = nullptr;
 	}
@@ -188,7 +188,7 @@ public:
 	Uspjeh(GodinaStudija godina) {
 		_godina = new GodinaStudija(godina);
 	}
-	Uspjeh(const Uspjeh &u):_predmeti(u._predmeti), _godina(new GodinaStudija(*u._godina)) { }
+	Uspjeh(const Uspjeh &u) :_predmeti(u._predmeti), _godina(new GodinaStudija(*u._godina)) { }
 	~Uspjeh() { delete _godina; _godina = nullptr; }
 
 	Dictionary<Predmet, DatumVrijeme> * GetPredmeti() { return &_predmeti; }
@@ -207,7 +207,7 @@ class Student {
 	string _emailAdresa;
 	string _brojTelefona;
 	vector<Uspjeh> _uspjeh;
-	
+
 	string ValidirajEmail(string email) {
 		if (regex_match(email, regex("([A-Za-z//.]{1,})([@])(hotmail.com|outlook.com|fit.ba)"))) return email;
 		return "notSet@fit.ba";
@@ -233,6 +233,7 @@ public:
 	char * GetImePrezime() { return _imePrezime; }
 
 	bool AddPredmet(Predmet p, GodinaStudija g, DatumVrijeme d) {
+		bool flag = false;
 		for (vector<Uspjeh>::iterator i = _uspjeh.begin(); i != _uspjeh.end(); i++)
 		{
 			if (g == *i->GetGodinaStudija()) {
@@ -241,14 +242,18 @@ public:
 					if (p == i->GetPredmeti()->getElement1(j)) return false;
 					if (d.GetDateInHours() <= i->GetPredmeti()->getElement2(j).GetDateInHours()) return false;
 				}
+				i->AddPredmet(p, d);
+				flag = true;
 			}
 		}
-		Uspjeh u(g);
-		u.AddPredmet(p, d);
-		_uspjeh.push_back(u);
+		if (!flag) {
+			Uspjeh u(g);
+			u.AddPredmet(p, d);
+			_uspjeh.push_back(u);
+		}
 		thread t1([&]() {
 			m.lock();
-			cout << "FROM:info@fit.ba" << endl << "TO : emailStudenta" << endl << "Postovani ime i prezime, evidentirali ste uspjeh za "<<g<<" godinu studija." << endl << "Pozdrav." << endl << "FIT Team." << endl;
+			cout << "FROM:info@fit.ba" << endl << "TO : emailStudenta" << endl << "Postovani ime i prezime, evidentirali ste uspjeh za " << g << " godinu studija." << endl << "Pozdrav." << endl << "FIT Team." << endl;
 			m.unlock();
 		});
 		thread t2([&]() {
@@ -264,14 +269,14 @@ public:
 				}
 			}
 			if (prosjek > 8) {
-				cout<<"Saljem sms "<<endl<<" Svaka cast za uspjeh "<<prosjek<<" ostvaren u X godini studija"<<endl;
+				cout << "Saljem sms " << endl << " Svaka cast za uspjeh " << prosjek << " ostvaren u " << g << " godini studija" << endl;
 			}
 		});
 		t1.join();
 		t2.join();
 		return true;
 	}
-	vector<Predmet> operator()(DatumVrijeme *OD, DatumVrijeme *DO){
+	vector<Predmet> operator()(DatumVrijeme *OD, DatumVrijeme *DO) {
 		vector<Predmet> p;
 		for (size_t i = 0; i < _uspjeh.size(); i++)
 		{
@@ -299,7 +304,7 @@ public:
 		{
 			for (size_t j = 0; j < _uspjeh[i].GetPredmeti()->getTrenutno(); j++)
 			{
-				regex r("(\\b"+substr+"\\b|\\B"+substr+"\\B)");
+				regex r("(\\b" + substr + "\\b|\\B" + substr + "\\B)");
 				string napomena = _uspjeh[i].GetPredmeti()->getElement1(j).GetNapomena();
 				auto start = sregex_iterator(napomena.begin(), napomena.end(), r);
 				auto end = sregex_iterator();
