@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -193,7 +193,7 @@ class Donator : public Osoba {
 
 public:
 	Donator(const char* imePrezime, KrvnaGrupa krvnaGrupa, string telefon, Datum dpd, bool remind = true, bool contact = true)
-		: Osoba(imePrezime, krvnaGrupa), _datumPosljednjegDoniranja(dpd) {
+		: Osoba(imePrezime, krvnaGrupa), _datumPosljednjegDoniranja(dpd), _podsjetiMe(remind), _kontaktirajMe(contact) {
 		if (ValidanFormat(telefon))
 			_telefon = telefon;
 		else
@@ -285,9 +285,9 @@ public:
 				for (size_t i = 0; i < this->GetDonacije().GetTrenutno(); i++)
 				{
 					Donator *d = dynamic_cast<Donator*>(this->GetDonacije().GetElement1(i));
-					for (size_t j = 0; j < d->GetKrvnaGrupa().GetDonatori().size(); j++)
+					for (size_t j = 0; j < d->GetKrvnaGrupa().GetPrimaoci().size(); j++)
 					{
-						if (d->GetKrvnaGrupa().GetDonatori()[j] == z.GetKrvnaGrupa() && d->GetKontaktirajMe() && (z.GetDatumZahtjeva() - d->GetDatumPosljednjegDarivanja()) < 90) { // 3 mjeseca kada se pretvori u dane je otprilike 90 dana
+						if (d->GetKrvnaGrupa().GetPrimaoci()[j] == z.GetKrvnaGrupa() && d->GetKontaktirajMe() && (z.GetDatumZahtjeva() - d->GetDatumPosljednjegDarivanja()) >= 90) { // 3 mjeseca kada se pretvori u dane je otprilike 90 dana
 							cout << "Saljem SMS na broj telefona..." << endl;
 							cout << "Broj Telefona -> " << d->GetBrojTelefona() << endl;
 							cout << "Potrebne zalihe krvi.."<<endl;
