@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -9,10 +9,10 @@
 #include <mutex>
 using namespace std;
 
-const char *crt = "\n-------------------------------------------\n";
+const char* crt = "\n-------------------------------------------\n";
 enum OznakaKrvneGrupe { O, A, B, AB };
 const char* OznakaKrvneGrupeString[] = { "O", "A", "B", "AB" };
-ostream &operator<<(ostream &o, const OznakaKrvneGrupe okg) {
+ostream& operator<<(ostream& o, const OznakaKrvneGrupe okg) {
 	if (okg == O) o << "O";
 	else if (okg == A) o << "A";
 	else if (okg == B) o << "B";
@@ -29,12 +29,12 @@ class Datum {
 public:
 	Datum(int dan, int mjesec, int godina) :
 		_dan(dan), _mjesec(mjesec), _godina(godina) {}
-	string ToString(string separator = ".") const{
+	string ToString(string separator = ".") const {
 		stringstream s;
 		s << _dan << separator << _mjesec << separator << _godina;
 		return s.str();
 	}
-	int operator -(const Datum &d) {
+	int operator -(const Datum& d) {
 		return (_dan + _mjesec * 30 + _godina * 365) - (d._dan + d._mjesec * 30 + d._godina * 365);
 	}
 };
@@ -110,7 +110,7 @@ public:
 			}
 		}
 	}
-	friend ostream &operator<<(ostream &COUT, const Kolekcija &obj) {
+	friend ostream& operator<<(ostream& COUT, const Kolekcija& obj) {
 		for (size_t i = 0; i < obj.GetTrenutno(); i++)
 			COUT << obj.GetElement1(i) << " " << obj.GetElement2(i) << endl;
 		return COUT;
@@ -135,18 +135,18 @@ public:
 	}
 	string ToString()const {
 		stringstream s;
-		s <<crt<< "Krvna grupa -> " << _oznaka<<" "<<_rhFaktor<<crt;
+		s << crt << "Krvna grupa -> " << _oznaka << " " << _rhFaktor << crt;
 		s << "Donatori: ";
-		for (vector<KrvnaGrupa>::const_iterator i = _donatori.begin(); i != _donatori.end(); i++) 
-			s << i->_oznaka<<i->_rhFaktor << ", ";
+		for (vector<KrvnaGrupa>::const_iterator i = _donatori.begin(); i != _donatori.end(); i++)
+			s << i->_oznaka << i->_rhFaktor << ", ";
 
-		s <<endl<< "Primaoci -> ";
+		s << endl << "Primaoci -> ";
 		for (vector<KrvnaGrupa>::const_iterator i = _primaoci.begin(); i != _primaoci.end(); i++)
-			s << i->_oznaka<<i->_rhFaktor << ", ";
+			s << i->_oznaka << i->_rhFaktor << ", ";
 		s << crt;
 		return s.str();
 	}
-	bool operator ==(const KrvnaGrupa &kg) {
+	bool operator ==(const KrvnaGrupa& kg) {
 		if (_oznaka == kg._oznaka && _rhFaktor == kg._rhFaktor) return true;
 		return false;
 	}
@@ -165,7 +165,7 @@ public:
 		_imePrezime = new char[size];
 		strcpy_s(_imePrezime, size, imePrezime);
 	}
-	Osoba(const Osoba &o) :_krvnaGrupa(o._krvnaGrupa){
+	Osoba(const Osoba& o) :_krvnaGrupa(o._krvnaGrupa) {
 		int size = strlen(o._imePrezime) + 1;
 		_imePrezime = new char[size];
 		strcpy_s(_imePrezime, size, o._imePrezime);
@@ -175,11 +175,11 @@ public:
 		_imePrezime = nullptr;
 	}
 	KrvnaGrupa GetKrvnaGrupa()const { return _krvnaGrupa; }
-	bool operator == (const Osoba &o) {
+	bool operator == (const Osoba& o) {
 		return strcmp(_imePrezime, o._imePrezime) == 0;
 	}
-	friend ostream &operator <<(ostream &o, const Osoba &osoba) {
-		o << osoba._imePrezime<<osoba._krvnaGrupa.ToString()<<endl;
+	friend ostream& operator <<(ostream& o, const Osoba& osoba) {
+		o << osoba._imePrezime << osoba._krvnaGrupa.ToString() << endl;
 		return o;
 	}
 };
@@ -193,14 +193,14 @@ class Donator : public Osoba {
 
 public:
 	Donator(const char* imePrezime, KrvnaGrupa krvnaGrupa, string telefon, Datum dpd, bool remind = true, bool contact = true)
-		: Osoba(imePrezime, krvnaGrupa), _datumPosljednjegDoniranja(dpd) {
+		: Osoba(imePrezime, krvnaGrupa), _datumPosljednjegDoniranja(dpd), _podsjetiMe(remind), _kontaktirajMe(contact) {
 		if (ValidanFormat(telefon))
 			_telefon = telefon;
 		else
 			_telefon = "000-000-000";
 	}
-	Donator(const Donator &d) :Osoba(d), _datumPosljednjegDoniranja(d._datumPosljednjegDoniranja), _telefon(d._telefon),
-	_podsjetiMe(d._podsjetiMe), _kontaktirajMe(d._kontaktirajMe){}
+	Donator(const Donator& d) :Osoba(d), _datumPosljednjegDoniranja(d._datumPosljednjegDoniranja), _telefon(d._telefon),
+		_podsjetiMe(d._podsjetiMe), _kontaktirajMe(d._kontaktirajMe) {}
 	void setDatumPosljednjegDoniranja(Datum d) {
 		_datumPosljednjegDoniranja = d;
 	}
@@ -208,9 +208,9 @@ public:
 	string GetBrojTelefona() { return _telefon; }
 	Datum GetDatumPosljednjegDarivanja() { return _datumPosljednjegDoniranja; }
 	Osoba getosoba() { return *this; }
-	friend ostream & operator<<(ostream &o, const Donator &d) {
-		o << "Telefon -> " << d._telefon<<endl;
-		o << "Datum posljednjeg doniranja"<<d._datumPosljednjegDoniranja.ToString()<< endl;
+	friend ostream& operator<<(ostream& o, const Donator& d) {
+		o << "Telefon -> " << d._telefon << endl;
+		o << "Datum posljednjeg doniranja" << d._datumPosljednjegDoniranja.ToString() << endl;
 		return o;
 	}
 };
@@ -240,10 +240,10 @@ class TransfuzijskiCentar {
 	//stanje zaliha za svaku pojedinu krvnu grupu
 	Kolekcija<KrvnaGrupa*, double, 8> _zalihe;
 	//evidentira svaku donaciju krvi
-	Kolekcija<Osoba *, double, 100> _donacije;
+	Kolekcija<Osoba*, double, 100> _donacije;
 	vector<Zahtjev> _zahtjevi;
 public:
-	bool AddDonaciju(Datum d, Osoba *o, double kolicina) {
+	bool AddDonaciju(Datum d, Osoba* o, double kolicina) {
 		bool postojiKrvnaGrupa = false;
 		for (size_t i = 0; i < _zalihe.GetTrenutno(); i++)
 		{
@@ -254,7 +254,7 @@ public:
 		}
 		if (!postojiKrvnaGrupa)
 			_zalihe.AddElement(new KrvnaGrupa(o->GetKrvnaGrupa()), kolicina);
-		Donator *donator = dynamic_cast<Donator*>(o);
+		Donator* donator = dynamic_cast<Donator*>(o);
 		for (size_t i = 0; i < _donacije.GetTrenutno(); i++)
 		{
 			if (*_donacije.GetElement1(i) == *o) {
@@ -284,28 +284,28 @@ public:
 				m.lock();
 				for (size_t i = 0; i < this->GetDonacije().GetTrenutno(); i++)
 				{
-					Donator *d = dynamic_cast<Donator*>(this->GetDonacije().GetElement1(i));
+					Donator* d = dynamic_cast<Donator*>(this->GetDonacije().GetElement1(i));
 					for (size_t j = 0; j < d->GetKrvnaGrupa().GetDonatori().size(); j++)
 					{
-						if (d->GetKrvnaGrupa().GetDonatori()[j] == z.GetKrvnaGrupa() && d->GetKontaktirajMe() && (z.GetDatumZahtjeva() - d->GetDatumPosljednjegDarivanja()) < 90) { // 3 mjeseca kada se pretvori u dane je otprilike 90 dana
+						if (d->GetKrvnaGrupa().GetDonatori()[j] == z.GetKrvnaGrupa() && d->GetKontaktirajMe() && (z.GetDatumZahtjeva() - d->GetDatumPosljednjegDarivanja()) >= 90) { // 3 mjeseca kada se pretvori u dane je otprilike 90 dana
 							cout << "Saljem SMS na broj telefona..." << endl;
 							cout << "Broj Telefona -> " << d->GetBrojTelefona() << endl;
-							cout << "Potrebne zalihe krvi.."<<endl;
+							cout << "Potrebne zalihe krvi.." << endl;
 							this_thread::sleep_for(chrono::milliseconds(2000));
 						}
 					}
 				}
 				m.unlock();
-			});
+				});
 			t.join();
 			return false;
 		}
 		_zahtjevi.push_back(z);
 		return true;
-		
+
 	}
 	void GetZahvalniceZahvalnice(int redniBroj) {
-		Kolekcija<Osoba *, double, 100> donatoriKolicinaTemp(_donacije);
+		Kolekcija<Osoba*, double, 100> donatoriKolicinaTemp(_donacije);
 		donatoriKolicinaTemp.SetKeyElement(2);
 		donatoriKolicinaTemp.Sort("DESC");
 		if (redniBroj > donatoriKolicinaTemp.GetTrenutno())
@@ -315,10 +315,10 @@ public:
 		{
 			cout << "Donator : ";
 			cout << *dynamic_cast<Donator*>(donatoriKolicinaTemp.GetElement1(i));
-			cout << endl << "Donirana Kolicina: "<<donatoriKolicinaTemp.GetElement2(i)<<endl;
+			cout << endl << "Donirana Kolicina: " << donatoriKolicinaTemp.GetElement2(i) << endl;
 		}
 	}
-	Kolekcija<Osoba *, double, 100> GetDonacije() { return _donacije; }
+	Kolekcija<Osoba*, double, 100> GetDonacije() { return _donacije; }
 	~TransfuzijskiCentar() {
 		for (size_t i = 0; i < _zalihe.GetTrenutno(); i++)
 			delete _zalihe.GetElement1(i);
@@ -383,9 +383,9 @@ void main() {
 	*/
 	cout << O_poz.ToString() << endl;
 
-	Osoba * jasmin = new Donator("Jasmin Azemovic", B_poz, "061-111-222", Datum(12, 2, 2017), true, true);
-	Osoba * adel = new Donator("Adel Handzic", A_neg, "061-222-333", Datum(9, 1, 2017), true, true);
-	Osoba * goran = new Donator("Goran Skondric", B_neg, "061-333-444", Datum(9, 3, 2017), true, true);
+	Osoba* jasmin = new Donator("Jasmin Azemovic", B_poz, "061-111-222", Datum(12, 2, 2017), true, true);
+	Osoba* adel = new Donator("Adel Handzic", A_neg, "061-222-333", Datum(9, 1, 2017), true, true);
+	Osoba* goran = new Donator("Goran Skondric", B_neg, "061-333-444", Datum(9, 3, 2017), true, true);
 
 
 	TransfuzijskiCentar tcMostar;
@@ -425,5 +425,4 @@ void main() {
 	delete goran;
 	system("pause");
 }
-
 
