@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <regex>
 #include <string>
@@ -9,18 +9,18 @@
 
 using namespace std;
 
-const char *crt = "\n-------------------------------------------\n";
+const char* crt = "\n-------------------------------------------\n";
 enum GodinaStudija { PRVA = 1, DRUGA, TRECA };
 mutex m;
 
-char * Alociraj(const char * sadrzaj) {
+char* Alociraj(const char* sadrzaj) {
 	if (sadrzaj == nullptr)return nullptr;
 	int vel = strlen(sadrzaj) + 1;
-	char * temp = new char[vel];
+	char* temp = new char[vel];
 	strcpy_s(temp, vel, sadrzaj);
 	return temp;
 }
-ostream &operator <<(ostream &o, GodinaStudija g) {
+ostream& operator <<(ostream& o, GodinaStudija g) {
 	if (g == PRVA) o << "Prva";
 	else if (g == DRUGA) o << "Druga";
 	else if (g == TRECA) o << "Treca";
@@ -28,16 +28,16 @@ ostream &operator <<(ostream &o, GodinaStudija g) {
 }
 template<class T1, class T2>
 class Dictionary {
-	T1 * _elementi1;
-	T2 * _elementi2;
-	int * _trenutno;
+	T1* _elementi1;
+	T2* _elementi2;
+	int* _trenutno;
 public:
 	Dictionary() {
 		_elementi1 = nullptr;
 		_elementi2 = nullptr;
 		_trenutno = new int(0);
 	}
-	Dictionary(const Dictionary & d) {
+	Dictionary(const Dictionary& d) {
 		_trenutno = new int(*d._trenutno);
 		_elementi1 = new T1[*d._trenutno];
 		_elementi2 = new T2[*d._trenutno];
@@ -55,18 +55,18 @@ public:
 	T1& getElement1(int lokacija)const { return _elementi1[lokacija]; }
 	T2& getElement2(int lokacija)const { return _elementi2[lokacija]; }
 	int getTrenutno() { return *_trenutno; }
-	friend ostream& operator<< (ostream &COUT, const Dictionary &obj) {
+	friend ostream& operator<< (ostream& COUT, const Dictionary& obj) {
 		for (size_t i = 0; i < *obj._trenutno; i++)
 			COUT << obj.getElement1(i) << " " << obj.getElement2(i) << endl;
 		return COUT;
 	}
-	void AddElement(const T1 &el1, const T2 &el2) {
+	void AddElement(const T1& el1, const T2& el2) {
 		for (size_t i = 0; i < *_trenutno; i++)
 		{
 			if (el1 == _elementi1[i]) return;
 		}
-		T1 *temp1 = new T1[*_trenutno + 1];
-		T2 *temp2 = new T2[*_trenutno + 1];
+		T1* temp1 = new T1[*_trenutno + 1];
+		T2* temp2 = new T2[*_trenutno + 1];
 		for (size_t i = 0; i < *_trenutno; i++)
 		{
 			temp1[i] = _elementi1[i];
@@ -80,8 +80,8 @@ public:
 		(*_trenutno)++;
 	}
 	Dictionary getRange(int i, int j) {
-		if (i < j || j < 0) throw exception("Nevalidni argumenti");
-		if (i > *_trenutno || j > *_trenutno) throw exception("Nema toliko elemenata");
+		if (i < 0 || j < 0 || j < i) throw exception("Nevalidni argumenti");
+		if (i > * _trenutno || j > * _trenutno) throw exception("Nema toliko elemenata");
 		Dictionary<T1, T2> temp;
 		for (size_t k = i; k <= j; k++)
 		{
@@ -89,7 +89,7 @@ public:
 		}
 		return temp;
 	}
-	Dictionary &operator = (const Dictionary &d) {
+	Dictionary& operator = (const Dictionary& d) {
 		if (this != &d) {
 			delete[] _elementi1; delete[] _elementi2;
 			*_trenutno = *d._trenutno;
@@ -104,7 +104,7 @@ public:
 	}
 };
 class DatumVrijeme {
-	int *_dan, *_mjesec, *_godina, *_sati, *_minuti;
+	int* _dan, * _mjesec, * _godina, * _sati, * _minuti;
 public:
 	DatumVrijeme(int dan = 1, int mjesec = 1, int godina = 2000, int sati = 0, int minuti = 0) {
 		_dan = new int(dan);
@@ -113,7 +113,7 @@ public:
 		_sati = new int(sati);
 		_minuti = new int(minuti);
 	}
-	DatumVrijeme(const DatumVrijeme &d) :DatumVrijeme(*d._dan, *d._mjesec, *d._godina, *d._sati, *d._minuti) {}
+	DatumVrijeme(const DatumVrijeme& d) :DatumVrijeme(*d._dan, *d._mjesec, *d._godina, *d._sati, *d._minuti) {}
 	~DatumVrijeme() {
 		delete _dan; _dan = nullptr;
 		delete _mjesec; _mjesec = nullptr;
@@ -121,19 +121,19 @@ public:
 		delete _sati; _sati = nullptr;
 		delete _minuti; _minuti = nullptr;
 	}
-	friend ostream& operator<< (ostream &COUT, const DatumVrijeme &obj) {
+	friend ostream& operator<< (ostream& COUT, const DatumVrijeme& obj) {
 		COUT << *obj._dan << "." << *obj._mjesec << "." << *obj._godina << " " << *obj._sati << ":" << *obj._minuti << endl;
 		return COUT;
 	}
-	char * ToCharArray() {
+	char* ToCharArray() {
 		stringstream ss;
 		ss << (*_dan < 10 ? "0" : "") << *_dan << "/" << (*_mjesec < 10 ? "0" : "") << *_mjesec << "/" << *_godina
 			<< " " << (*_sati < 10 ? "0" : "") << *_sati << ":" << (*_minuti < 10 ? "0" : "") << *_minuti;
 		return Alociraj(ss.str().c_str());
 	}
-	DatumVrijeme &operator = (const DatumVrijeme &dv) {
+	DatumVrijeme& operator = (const DatumVrijeme& dv) {
 		if (this != &dv) {
-			*_dan = *dv._dan, *_mjesec = *dv._mjesec, *_godina = *dv._godina, *_sati = *dv._sati, *_minuti = *dv._minuti;
+			*_dan = *dv._dan, * _mjesec = *dv._mjesec, * _godina = *dv._godina, * _sati = *dv._sati, * _minuti = *dv._minuti;
 		}
 		return *this;
 	}
@@ -143,34 +143,34 @@ public:
 };
 
 class Predmet {
-	char * _naziv;
+	char* _naziv;
 	int _ocjena;
 	string _napomena;
 public:
-	Predmet(const char * naziv = "", int ocjena = 0, string napomena = "") {
+	Predmet(const char* naziv = "", int ocjena = 0, string napomena = "") {
 		_naziv = Alociraj(naziv);
 		_ocjena = ocjena;
 		_napomena = napomena;
 	}
-	Predmet(const Predmet &p) :Predmet(p._naziv, p._ocjena, p._napomena) { }
+	Predmet(const Predmet& p) :Predmet(p._naziv, p._ocjena, p._napomena) { }
 	~Predmet() {
 		delete[] _naziv; _naziv = nullptr;
 	}
-	friend ostream& operator<< (ostream &COUT, Predmet &obj) {
+	friend ostream& operator<< (ostream& COUT, Predmet& obj) {
 		COUT << obj._naziv << " (" << obj._ocjena << ") " << obj._napomena << endl;
 		return COUT;
 	}
 	string GetNapomena() { return _napomena; }
-	char * GetNaziv() { return _naziv; }
+	char* GetNaziv() { return _naziv; }
 	int GetOcjena() { return _ocjena; }
 
 	void DodajNapomenu(string napomena) {
 		_napomena += " " + napomena;
 	}
-	bool operator == (const Predmet &p) const {
+	bool operator == (const Predmet& p) const {
 		return strcmp(_naziv, p._naziv) == 0;
 	}
-	Predmet &operator = (const Predmet &p) {
+	Predmet& operator = (const Predmet& p) {
 		if (this != &p) {
 			delete[] _naziv;
 			_naziv = Alociraj(p._naziv);
@@ -181,19 +181,19 @@ public:
 	}
 };
 class Uspjeh {
-	GodinaStudija * _godina;
+	GodinaStudija* _godina;
 	//datumvrijeme se odnosi na vrijeme evidentiranja polozenog predmeta
 	Dictionary<Predmet, DatumVrijeme> _predmeti;
 public:
 	Uspjeh(GodinaStudija godina) {
 		_godina = new GodinaStudija(godina);
 	}
-	Uspjeh(const Uspjeh &u) :_predmeti(u._predmeti), _godina(new GodinaStudija(*u._godina)) { }
+	Uspjeh(const Uspjeh& u) :_predmeti(u._predmeti), _godina(new GodinaStudija(*u._godina)) { }
 	~Uspjeh() { delete _godina; _godina = nullptr; }
 
-	Dictionary<Predmet, DatumVrijeme> * GetPredmeti() { return &_predmeti; }
-	GodinaStudija * GetGodinaStudija() { return _godina; }
-	friend ostream& operator<< (ostream &COUT, const Uspjeh &obj) {
+	Dictionary<Predmet, DatumVrijeme>* GetPredmeti() { return &_predmeti; }
+	GodinaStudija* GetGodinaStudija() { return _godina; }
+	friend ostream& operator<< (ostream& COUT, const Uspjeh& obj) {
 		COUT << *obj._godina << " " << obj._predmeti << endl;
 		return COUT;
 	}
@@ -203,7 +203,7 @@ public:
 };
 
 class Student {
-	char * _imePrezime;
+	char* _imePrezime;
 	string _emailAdresa;
 	string _brojTelefona;
 	vector<Uspjeh> _uspjeh;
@@ -213,7 +213,7 @@ class Student {
 		return "notSet@fit.ba";
 	}
 public:
-	Student(const char * imePrezime, string emailAdresa, string brojTelefona) {
+	Student(const char* imePrezime, string emailAdresa, string brojTelefona) {
 		_imePrezime = Alociraj(imePrezime);
 		_emailAdresa = ValidirajEmail(emailAdresa);
 		_brojTelefona = brojTelefona;
@@ -221,16 +221,16 @@ public:
 	~Student() {
 		delete[] _imePrezime; _imePrezime = nullptr;
 	}
-	friend ostream& operator<< (ostream &COUT, Student &obj) {
+	friend ostream& operator<< (ostream& COUT, Student& obj) {
 		COUT << obj._imePrezime << " " << obj._emailAdresa << " " << obj._brojTelefona << endl;
 		ostream_iterator<Uspjeh> o_it(COUT, crt);
 		copy(obj._uspjeh.begin(), obj._uspjeh.end(), o_it);
 		return COUT;
 	}
-	vector<Uspjeh> * GetUspjeh() { return &_uspjeh; }
+	vector<Uspjeh>* GetUspjeh() { return &_uspjeh; }
 	string GetEmail() { return _emailAdresa; }
 	string GetBrojTelefona() { return _brojTelefona; }
-	char * GetImePrezime() { return _imePrezime; }
+	char* GetImePrezime() { return _imePrezime; }
 
 	bool AddPredmet(Predmet p, GodinaStudija g, DatumVrijeme d) {
 		bool flag = false;
@@ -255,7 +255,7 @@ public:
 			m.lock();
 			cout << "FROM:info@fit.ba" << endl << "TO : emailStudenta" << endl << "Postovani ime i prezime, evidentirali ste uspjeh za " << g << " godinu studija." << endl << "Pozdrav." << endl << "FIT Team." << endl;
 			m.unlock();
-		});
+			});
 		thread t2([&]() {
 			float prosjek = 0;
 			for (vector<Uspjeh>::iterator i = this->GetUspjeh()->begin(); i != this->GetUspjeh()->end(); i++)
@@ -271,12 +271,12 @@ public:
 			if (prosjek > 8) {
 				cout << "Saljem sms " << endl << " Svaka cast za uspjeh " << prosjek << " ostvaren u " << g << " godini studija" << endl;
 			}
-		});
+			});
 		t1.join();
 		t2.join();
 		return true;
 	}
-	vector<Predmet> operator()(DatumVrijeme *OD, DatumVrijeme *DO) {
+	vector<Predmet> operator()(DatumVrijeme* OD, DatumVrijeme* DO) {
 		vector<Predmet> p;
 		for (size_t i = 0; i < _uspjeh.size(); i++)
 		{
@@ -289,7 +289,7 @@ public:
 		}
 		return p;
 	}
-	Uspjeh * operator[](string gs) {
+	Uspjeh* operator[](string gs) {
 		for (size_t i = 0; i < _uspjeh.size(); i++)
 		{
 			if (gs == "PRVA" && *_uspjeh[i].GetGodinaStudija() == PRVA) return &_uspjeh[i];
@@ -339,7 +339,7 @@ void main() {
 	const int DictionaryTestSize = 9;
 	Dictionary<int, int> Dictionary1;
 	for (size_t i = 0; i < DictionaryTestSize; i++)
-		Dictionary1.AddElement(i + 1, i*i);
+		Dictionary1.AddElement(i + 1, i * i);
 
 	try {
 		//vraca elemente kolekcije koji se nalaze na lokacijama definisanim vrijednostima parametara (npr. 2 - 7). 
@@ -419,7 +419,7 @@ void main() {
 	for (Predmet u : jasminUspjeh)
 		cout << u << endl;
 
-	Uspjeh * uspjeh_I_godina = jasmin["PRVA"];//vraca uspjeh Studenta ostvaren u prvoj godini studija
+	Uspjeh* uspjeh_I_godina = jasmin["PRVA"];//vraca uspjeh Studenta ostvaren u prvoj godini studija
 	if (uspjeh_I_godina != nullptr)
 		cout << *uspjeh_I_godina << endl;
 
