@@ -3,6 +3,7 @@
 #include <vector>
 #include <regex>
 #include <mutex>
+#include <thread>
 using namespace std;
 const char* PORUKA = "\n-------------------------------------------------------------------------------\n"
 "0. PROVJERITE DA LI PREUZETI ZADACI PRIPADAJU VASOJ GRUPI (G1/G2)\n"
@@ -170,7 +171,7 @@ public:
 
 class Tehnika {
 	char* _naziv;
-	//int se odnosi na ocjenu u opsegu od 1 – 5, a Datum na datum kada je ocijenjena odredjena tehnika 
+	//int se odnosi na ocjenu u opsegu od 1 â€“ 5, a Datum na datum kada je ocijenjena odredjena tehnika 
 	Kolekcija<int, Datum, brojTehnika>* _ocjene;
 public:
 	Tehnika(const char* naziv) {
@@ -248,6 +249,7 @@ public:
 	}
 
 	float GetProsjek() {
+		if (_polozeneTehnike.size() == 0) return 0;
 		float suma = 0;
 		for (size_t i = 0; i < _polozeneTehnike.size(); i++)
 		{
@@ -279,11 +281,11 @@ public:
 class KaratePolaznik : public Korisnik {
 	vector<Polaganje> _polozeniPojasevi;
 
-	void PosaljiEmail(string nazivTeknike, Pojas p, float prosjekNaPojasu) {
+	void PosaljiEmail(const char* nazivTeknike, Pojas p, float prosjekNaPojasu) {
 		m.lock();
-		cout << "FROM:info@karate.ba\nTO: "<< _emailAdresa <<"\n\nPostovani "<<_imePrezime<<", evidentirana vam je thenika "<<nazivTeknike<<" za "<<p<<" pojas. Dosadasnji uspjeh(prosjek ocjena)\
+		cout << crt<<"FROM:info@karate.ba\nTO: "<< _emailAdresa <<"\n\nPostovani "<<_imePrezime<<", evidentirana vam je thenika "<<nazivTeknike<<" za "<<p<<" pojas. Dosadasnji uspjeh(prosjek ocjena)\
             na pojasu "<<p<<" iznosi "<<prosjekNaPojasu<<", a ukupni uspjeh(prosjek ocjena) na svim pojasevima iznosi "<<GetUkupniProsjek()<<".\
-            Pozdrav.\n\nKARATE Team.";
+            Pozdrav.\n\nKARATE Team."<<crt;
 		m.unlock();
 	}
 public:
@@ -299,6 +301,7 @@ public:
 		return COUT;
 	}
 	float GetUkupniProsjek() {
+		if (_polozeniPojasevi.size() == 0) return 0;
 		float suma = 0;
 		for (size_t i = 0; i < _polozeniPojasevi.size(); i++)
 		{
@@ -322,7 +325,12 @@ public:
 		{
 			if (_polozeniPojasevi[i].GetPojas() == p)
 			{
-				return _polozeniPojasevi[i].AddTehniku(t);
+				if (_polozeniPojasevi[i].AddTehniku(t)) {
+					thread th(&KaratePolaznik::PosaljiEmail, this, t.GetNaziv(), p, _polozeniPojasevi[i].GetProsjek());
+					th.join();
+					return true;
+				}
+				return false;
 			}
 		}
 		if (p != ZUTI && (GetPolaganjeByPojas(Pojas((int)p - 1)).GetTehnike().size() < 3 || GetPolaganjeByPojas(Pojas((int)p - 1)).GetProsjek() <= 3.5)) {
@@ -331,6 +339,8 @@ public:
 		Polaganje polaganje(p);
 		polaganje.AddTehniku(t);
 		_polozeniPojasevi.push_back(p);
+		thread th(&KaratePolaznik::PosaljiEmail, this, t.GetNaziv(), p, polaganje.GetProsjek());
+		th.join();
 		return true;
 	}
 };
