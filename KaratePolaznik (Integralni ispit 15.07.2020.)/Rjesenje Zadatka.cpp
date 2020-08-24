@@ -223,10 +223,27 @@ public:
 	Polaganje(Pojas pojas = BIJELI) {
 		_pojas = pojas;
 	}
+	Polaganje(const Polaganje& p) {
+		_pojas = p._pojas;
+		for (size_t i = 0; i < p._polozeneTehnike.size(); i++)
+		{
+			_polozeneTehnike.push_back(new Tehnika(*p._polozeneTehnike[i]));
+		}
+	}
 	~Polaganje() {
 		for (size_t i = 0; i < _polozeneTehnike.size(); i++) {
 			delete _polozeneTehnike[i];
 			_polozeneTehnike[i] = nullptr;
+		}
+	}
+	Polaganje& operator==(const Polaganje& p) {
+		for (size_t i = 0; i < _polozeneTehnike.size(); i++) {
+			delete _polozeneTehnike[i];
+		}
+		_polozeneTehnike.clear();
+		for (size_t i = 0; i < p._polozeneTehnike.size(); i++)
+		{
+			_polozeneTehnike.push_back(new Tehnika(*p._polozeneTehnike[i]));
 		}
 	}
 	vector<Tehnika*>& GetTehnike() { return _polozeneTehnike; }
@@ -283,9 +300,9 @@ class KaratePolaznik : public Korisnik {
 
 	void PosaljiEmail(const char* nazivTeknike, Pojas p, float prosjekNaPojasu) {
 		m.lock();
-		cout << crt<<"FROM:info@karate.ba\nTO: "<< _emailAdresa <<"\n\nPostovani "<<_imePrezime<<", evidentirana vam je thenika "<<nazivTeknike<<" za "<<p<<" pojas. Dosadasnji uspjeh(prosjek ocjena)\
-            na pojasu "<<p<<" iznosi "<<prosjekNaPojasu<<", a ukupni uspjeh(prosjek ocjena) na svim pojasevima iznosi "<<GetUkupniProsjek()<<".\
-            Pozdrav.\n\nKARATE Team."<<crt;
+		cout << crt << "FROM:info@karate.ba\nTO: " << _emailAdresa << "\n\nPostovani " << _imePrezime << ", evidentirana vam je thenika " << nazivTeknike << " za " << p << " pojas. Dosadasnji uspjeh(prosjek ocjena)\
+            na pojasu " << p << " iznosi " << prosjekNaPojasu << ", a ukupni uspjeh(prosjek ocjena) na svim pojasevima iznosi " << GetUkupniProsjek() << ".\
+            Pozdrav.\n\nKARATE Team." << crt;
 		m.unlock();
 	}
 public:
@@ -338,7 +355,7 @@ public:
 		}
 		Polaganje polaganje(p);
 		polaganje.AddTehniku(t);
-		_polozeniPojasevi.push_back(p);
+		_polozeniPojasevi.push_back(polaganje);
 		thread th(&KaratePolaznik::PosaljiEmail, this, t.GetNaziv(), p, polaganje.GetProsjek());
 		th.join();
 		return true;
